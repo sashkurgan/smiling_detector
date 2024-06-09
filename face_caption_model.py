@@ -1,10 +1,10 @@
 import cv2
-import matplotlib.pyplot as plt
+
 import os
 
 
-imgs_folder = 'synthetic_images'
-faces_folder = 'real_test_captions_negative'
+imgs_folder = 'real_test_negative' #where images stored
+faces_folder = 'real_test_captions_negative' #folder for captions
 
 imgs = os.listdir(imgs_folder)
 print(imgs)
@@ -15,36 +15,37 @@ for i in range(len(imgs)):
     print(id)
     try:
 
-        # Загрузить изображение
+        # read image
         image = cv2.imread(f"{imgs_folder}/{img_path}")
 
-        # Преобразовать изображение в формат RGB
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # transform to BGR
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-        # Определить каскад классификатора лиц
+        # cascade for faces
         face_cascade = cv2.CascadeClassifier('lbpcascade_frontalface_improved.xml')
 
-        # Обнаружить лица на изображении
-        faces = face_cascade.detectMultiScale(image, 1.5, minNeighbors=3)
+        # detect faces
+        faces = face_cascade.detectMultiScale(image, 1.3, minNeighbors=1)
 
-        # Проверить, есть ли лица на изображении
+        # faces check
         if len(faces) == 0:
           print(f"На изображении не найдено лиц {id}")
 
 
         else:
 
-            # Выбрать первое обнаруженное лицо
+            # first face in cascade
             (x, y, w, h) = faces[0]
 
-            # Вырезать захваченное лицо
-            roi = image[y:y+h, x:x+w]
+            # face caption
+            roi = image[y-int(0.2*h):y+int(1.2*h), x-int(0.2*w):x+int(1.2*w)]
 
-            # Преобразовать изображение в формат BGR
-            roi = cv2.cvtColor(roi, cv2.COLOR_RGB2BGR)
-            roi = cv2.resize(roi,(64,64))
-            # Сохранить захваченное лицо
-            cv2.imwrite(f"{faces_folder}/caption_{id}.png", roi)
+            # transform to RGB
+            roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
+            roi = cv2.resize(roi,(128,128))
+            # img save
+            cv2.imwrite(f"{faces_folder}/caption_{id}.jpg", roi)
 
     except:
         print(f'проблема с изображением {id}')
+
